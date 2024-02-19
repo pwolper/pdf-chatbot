@@ -1,0 +1,8 @@
+#+title:  pdf-chatbot: Read and chat with PDF documents
+
+* further work
+- Improve pdf parsing of scientific papers (eg. using something like GROBID, [[https://github.com/kermitt2/grobid]])
+- Refine pdf text chunking (page breaks, references and metainformation, Figures?)
+- Add pdf uploader feature (fix compatibility to text reader and documents display)
+- Maybe add knowledge graph from chat_history
+- add button to clear chat history (in side bar. or multitab)
