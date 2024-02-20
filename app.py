@@ -140,7 +140,7 @@ def parse_bibtex(file="articles.bib"):
 ### Streamlit page starts here ###
 
 st.set_page_config(page_title="PDF Chatbot", page_icon=":books:", initial_sidebar_state="collapsed", layout="wide")
-st.title("pdf-chatbot: Question AI models about papers, while reading them")
+st.title("pdf-chatbot: Question AI models about papers, while reading")
 
 float_init()
 
