@@ -155,7 +155,8 @@ with a:
                            index = None,
                            label_visibility="collapsed")
 
-st.button("Click for PDF", type="primary")
+with b:
+    st.button("Click for PDF", type="primary")
 
 if article is None:
     st.stop()
@@ -196,6 +197,7 @@ with col1:
 with col2:
     container = st.container()
     with container:
+        st.markdown(str("**" + article + "**"))
         chat = st.container(height=410)
         user_query = st.chat_input("Type your message here...")
 
