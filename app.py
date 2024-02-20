@@ -140,7 +140,7 @@ def parse_bibtex(file="articles.bib"):
 ### Streamlit page starts here ###
 
 st.set_page_config(page_title="PDF Chatbot", page_icon=":books:", initial_sidebar_state="collapsed", layout="wide")
-st.title("pdf-chatbot: Question AI models about papers, while reading")
+st.title("pdf-chatbot: Question AI models about papers, while reading...")
 
 float_init()
 
@@ -197,8 +197,10 @@ with col1:
 with col2:
     container = st.container()
     with container:
+        st.write("")
+        st.write("")
         st.markdown(str("**" + article + "**"))
-        chat = st.container(height=410)
+        chat = st.container(height=550)
         user_query = st.chat_input("Type your message here...")
 
         if user_query is not None and user_query != "":
