@@ -1,5 +1,17 @@
 #+title:  pdf-chatbot: Read and chat with PDF documents
 
+* Bibliography
+This lists the published articles you are able to work with. The works are cited in articles.bib.
+
+- [[cite:&arnason-2015-nucleot-variat]]
+- [[cite:&eldon-2023-sweep-reprod]]
+- [[cite:&eldon-2018-evolut-highl]]
+- [[cite:&korfmann-2023-deter-rapid]]
+- [[cite:&johnson-2024-popul-genet-simul]]
+- [[cite:&johri-2022-recom-improv]]
+- [[cite:&shoemaker-1999-bayes-statis-genet]]
+  
+
 * further work
 - Improve pdf parsing of scientific papers (eg. using something like GROBID, [[https://github.com/kermitt2/grobid]])
 - Refine pdf text chunking (page breaks, references and metainformation, Figures?)
