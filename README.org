@@ -18,3 +18,4 @@ This lists the published articles you are able to work with. The works are cited
 - Add pdf uploader feature (fix compatibility to text reader and documents display)
 - Maybe add knowledge graph from chat_history
 - add button to clear chat history (in side bar. or multitab)
+- Add model selector
