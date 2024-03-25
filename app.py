@@ -51,6 +51,7 @@ def process_file(file):
     loader = PyPDFLoader(file)
     docs = loader.load_and_split()
     #st.write(str(str(len(docs))+ " documents extracted"))
+    print('file processed...')
     return(docs)
 
 def chunk_text(docs):
@@ -87,7 +88,7 @@ def get_context_retriever_chain(vectorstore):
     return(retriever_chain)
 
 def get_conversational_rag_chain(retriever_chain):
-    llm = ChatOpenAI()
+    llm = ChatOpenAI(model='gpt-4')
     prompt = ChatPromptTemplate.from_messages([
         ("system", "Answer the user's question in a brief manner based on the context below:\n\n{context}"),
         MessagesPlaceholder(variable_name="chat_history"),
@@ -124,14 +125,16 @@ def displayPDF(file):
 
 def parse_bibtex(file="articles.bib"):
     with open(file, 'r') as bib:
-        library = bibtexparser.parse_string(bib.read())
+        library = bibtexparser.load(bib)
 
         articles = []
         for entry in library.entries:
             info = {}
             info['title'] = entry['title']
             info['authors'] = entry['author']
-            info['pdf'] = str(entry.key + ".pdf")
+            info['pdf'] = str(entry['ID'] + ".pdf")
+            info['year'] = entry['year']
+            info['url'] = entry['url']
             articles.append(info)
     return(articles)
 
@@ -148,28 +151,47 @@ get_api_key()
 
 articles = parse_bibtex()
 
-a, b = st.columns([1,1])
+a, b, c = st.columns([2,0.1,0.5])
 with a:
     article = st.selectbox("Choose an article",
                            [a['title'] for a in articles],
                            index = None,
                            label_visibility="collapsed")
 
+    if article is not None:
+        dir = "data/"
+        pdf = str([a['pdf'] for a in articles if a['title'] == article][0])
+        file = dir + pdf
+
 with b:
-    st.button("Click for PDF", type="primary")
+    #st.button("Display PDF", type="primary")
+    st.write('or')
+
+with c:
+    uploader = st.button("Upload a file")
+    if uploader:
+        upload = st.file_uploader(label="Upload your pdf",
+                                label_visibility="collapsed")
+        if upload is not None:
+            # To read file as bytes:
+            bytes = upload.getvalue()
+            new_file = open('data/tmp/new.pdf', 'wb')
+            new_file.write(bytes)
+            article = 'User uploaded file'
+            file = 'data/tmp/new.pdf'
+            pdf = 'new.pdf'
+            st.write(article)
+
 
 if article is None:
     st.stop()
 
-dir = "data/"
-pdf = str([a['pdf'] for a in articles if a['title'] == article][0])
-file = dir + pdf
 
 ## Processing pdfs
 docs = process_file(file)
 chunks = chunk_text(docs)
 
-#st.write(f"Number of resulting text chunks: {len(chunks)}")
+st.write(f"Number of resulting text chunks: {len(chunks)}")
 
 
 ## Creating vector store
@@ -191,15 +213,16 @@ if "retrieved" not in st.session_state:
 col1, col2 = st.columns([1.4,1], gap="small")
 
 with col1:
-    st.markdown("")
     displayPDF(file)
 
 with col2:
     container = st.container()
     with container:
         st.write("")
-        st.write("")
-        st.markdown(str("**" + article + "**"))
+        #st.write("")
+        #header = str([a['title'] + ' (' + a['authors'] + ', ' + a['year'] + ')' for a in articles if a['title'] == article][0])
+        header = article
+        st.markdown(str('**' + header + '**'))
         chat = st.container(height=350)
         user_query = st.chat_input("Type your message here...")
 
