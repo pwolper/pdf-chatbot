@@ -51,7 +51,7 @@ def process_file(file):
     loader = PyPDFLoader(file)
     docs = loader.load_and_split()
     #st.write(str(str(len(docs))+ " documents extracted"))
-    print('file processed...')
+    #print('file processed...')
     return(docs)
 
 def chunk_text(docs):
@@ -143,7 +143,7 @@ def parse_bibtex(file="articles.bib"):
 ### Streamlit page starts here ###
 
 st.set_page_config(page_title="PDF Chatbot", page_icon=":books:", initial_sidebar_state="collapsed", layout="wide")
-st.markdown("**pdf-chatbot: Question AI models about papers, while reading...**")
+#st.markdown("**pdf-chatbot: Question AI models about papers, while reading...**")
 
 float_init()
 
@@ -151,7 +151,7 @@ get_api_key()
 
 articles = parse_bibtex()
 
-a, b, c = st.columns([2,0.1,0.5])
+a, b, c = st.columns([2,0.3,0.5])
 with a:
     article = st.selectbox("Choose an article",
                            [a['title'] for a in articles],
@@ -164,8 +164,8 @@ with a:
         file = dir + pdf
 
 with b:
-    #st.button("Display PDF", type="primary")
-    st.write('or')
+    st.button("Display PDF", type="primary")
+    #st.write('or')
 
 with c:
     uploader = st.button("Upload a file")
@@ -191,7 +191,7 @@ if article is None:
 docs = process_file(file)
 chunks = chunk_text(docs)
 
-st.write(f"Number of resulting text chunks: {len(chunks)}")
+#st.write(f"Number of resulting text chunks: {len(chunks)}")
 
 
 ## Creating vector store
@@ -218,12 +218,11 @@ with col1:
 with col2:
     container = st.container()
     with container:
-        st.write("")
-        #st.write("")
+        #upper_cont = st.container(height = 300)
         #header = str([a['title'] + ' (' + a['authors'] + ', ' + a['year'] + ')' for a in articles if a['title'] == article][0])
         header = article
         st.markdown(str('**' + header + '**'))
-        chat = st.container(height=350)
+        chat = st.container(height=650)
         user_query = st.chat_input("Type your message here...")
 
         if user_query is not None and user_query != "":
@@ -240,7 +239,7 @@ with col2:
                 with chat.chat_message("Human"):
                     st.write(message.content)
     container.float()
-    # container.button("Start", type="primary")
+    #container.button("Start", type="primary")
 
 
 with st.sidebar:
