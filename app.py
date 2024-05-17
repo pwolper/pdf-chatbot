@@ -42,7 +42,6 @@ get_api_key()
 
 articles = parse_bibtex()
 
-
 with st.sidebar:
     st.sidebar.title("PDF chatbot")
     st.markdown("**Question AI models about articles and generate knowledge graphs to enhance text understanding. Powered by OpenAI API and LangChain.**")
