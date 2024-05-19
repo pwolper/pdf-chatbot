@@ -13,7 +13,7 @@ PDF-chatbot for scientific articles with knowledge graph generation.
 4. Run the Streamlit app.
 
 #+begin_src sh
-  git clone https://github.com/yourusername/pdf-chatbot.git
+  git clone https://github.com/pwolper/pdf-chatbot.git
   cd pdf-chatbot
   pip install -r requirements.txt
   streamlit run app.py
