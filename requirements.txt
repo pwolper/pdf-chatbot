@@ -1,0 +1,13 @@
+bibtexparser==1.4.1
+langchain==0.2.0
+langchain_community==0.2.0
+langchain_core==0.2.0
+pyvis==0.3.2
+streamlit==1.31.0
+streamlit_float==0.3.2
+streamlit_pdf_viewer==0.0.9
+faiss-cpu==1.8.0
+openai==1.9.0
+tiktoken==0.5.2
+pypdf==3.17.4
+python-dotenv=1.0.1
