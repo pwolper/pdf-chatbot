@@ -90,7 +90,7 @@ with st.sidebar:
         st.session_state.binary = None
 
         if st.session_state.article is not None:
-            dir = "data/"
+            dir = "articles/"
             pdf = str([a['pdf'] for a in articles if a['title'] == st.session_state.article][0])
             file = dir + pdf
 

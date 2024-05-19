@@ -22,7 +22,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain_community.vectorstores import faiss
 
 def process_dir():
-    loader = PyPDFDirectoryLoader("data/")
+    loader = PyPDFDirectoryLoader("articles/")
     docs = loader.load_and_split()
     #st.write(str(str(len(docs))+ " documents extracted"))
     return(docs)
@@ -172,7 +172,7 @@ def pyvis_graph(nodes, edges):
     source_code = html_file.read()
     return(source_code)
 
-def parse_bibtex(file="articles.bib"):
+def parse_bibtex(file="articles/articles.bib"):
     with open(file, 'r') as bib:
         library = bibtexparser.load(bib)
 
