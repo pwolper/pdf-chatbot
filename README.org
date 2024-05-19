@@ -1,5 +1,3 @@
-#+title:  pdf-chatbot: Read and chat with PDF documents
-
 * PDF-Chatbot with Mind Map Generation
 PDF-chatbot for scientific articles with knowledge graph generation.
 
