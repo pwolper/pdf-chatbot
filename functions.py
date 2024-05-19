@@ -57,7 +57,8 @@ def create_vectorstore(chunks, pdf):
 def load_vectorstore(index_name):
     vectorstore = faiss.FAISS.load_local("vector_db",
                                          embeddings = OpenAIEmbeddings(),
-                                         index_name = index_name)
+                                         index_name = index_name,
+                                         allow_dangerous_deserialization=True)
     return(vectorstore)
 
 def get_context_retriever_chain(vectorstore):
