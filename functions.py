@@ -48,7 +48,7 @@ def chunk_text(docs):
     return(documents)
 
 #@st.cache_data()
-def create_vectorstore(chunks, file):
+def create_vectorstore(chunks, pdf):
         embeddings = OpenAIEmbeddings()
         vectorstore = faiss.FAISS.from_documents(chunks, embeddings)
         vectorstore.save_local("vector_db", index_name=pdf)
@@ -151,7 +151,7 @@ def json_parsing(mapping_output):
 
 def pyvis_graph(nodes, edges):
     nt = Network(directed=False,
-                 notebook=True,height="499px",width="599px",
+                 notebook=True,height="490px",width="599px",
                 #height="480px",
                 #width="620px",
                 #width="940px",
