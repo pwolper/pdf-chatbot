@@ -116,7 +116,7 @@ def llm_network_call(chat_history):
     Breaking down the conversation hierarchically and semantically, I want you to choose high-level concepts as nodes, avoiding overlap between concepts. Keep the number of nodes to a minimum.
 
     Concepts should be as atomistic as possible, but chosen so that there is high connectivity in the graph.
-    Return nodes and edges for the concept map and come up with a short sentence explaining each edge as well.
+    Return nodes and edges for the concept map and come up with a very short sentence explaining each edge as well.
     Text: {text}
 
     Strictly return a list of json objects, with the following fields:
@@ -150,9 +150,20 @@ def json_parsing(mapping_output):
         edges.append((node_1, node_2, edge))
     return(nodes, edges)
 
+def split_edge_labels(edges):
+    labels = []
+    for edge in edges:
+        labels.append(edge[2])
+        label = edge[2]
+        if len(label.split(' ')) > 11:
+            new_label = ' '.join(edge[2].split(' ', 10)[:10]) + '\n' + edge[2].split(' ', 10)[10]
+            print(new_label)
+    return(labels)
+
+
 def pyvis_graph(nodes, edges):
     nt = Network(directed=False,
-                 notebook=True,height="490px",width="599px",
+                 notebook=True,height="490px",width="799px",
                 #height="480px",
                 #width="620px",
                 #width="940px",

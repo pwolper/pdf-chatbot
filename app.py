@@ -15,7 +15,7 @@ from functions import parse_bibtex
 from functions import process_dir, process_file, chunk_text
 from functions import create_vectorstore, load_vectorstore
 from functions import get_context_retriever_chain, get_conversational_rag_chain
-from functions import get_response, llm_network_call, json_parsing, pyvis_graph
+from functions import get_response, llm_network_call, json_parsing, split_edge_labels, pyvis_graph
 
 load_dotenv(find_dotenv())
 
@@ -39,6 +39,17 @@ def get_api_key():
 ### Streamlit page starts here ###
 
 st.set_page_config(page_title="PDF Chatbot", page_icon=":books:", initial_sidebar_state="expanded", layout="wide")
+
+margins_css = """
+    <style>
+        .main > div {
+            padding-left: 0rem;
+            padding-right: 2rem;
+        }
+    </style>
+"""
+
+st.markdown(margins_css, unsafe_allow_html=True)
 
 float_init()
 
@@ -102,7 +113,11 @@ with st.sidebar:
             else:
                 st.session_state.vector_db = load_vectorstore(pdf)
 
-    st.markdown("**About**")
+    st.markdown("**_Tips_**")
+    st.markdown("Ask specific questions using keywords found in the paper!")
+    st.markdown("Be patient and try different prompts.")
+
+    st.markdown("**_About_**")
     st.markdown("Created by Philip Wolper ([phi.wolper@gmail.com](philip.wolper@gmail.com)). Code is available at [https://github.com/pwolper/pdf-chatbot.git](https://github.com/pwolper/pdf-chatbot) here. Feeback is very welcome.")
 
 
@@ -114,7 +129,18 @@ if st.session_state.article is None:
     st.stop()
 
 
-col1, col2 = st.columns([1.3,1], gap="small")
+col1, col2 = st.columns([1,1], gap="small")
+
+with col1:
+    display_container = st.container()
+    with display_container:
+        # displayPDF(file)
+        if st.session_state['binary']:
+            pdf_viewer(st.session_state.binary, width=800, height=1000)
+        else:
+            pdf_viewer(file, width=800, height=1000)
+
+    display_container.float()
 
 with col2:
     tab1, tab2 = st.tabs(["GPT-4", "Knowledge Graph"])
@@ -157,9 +183,10 @@ with col2:
             with (st.spinner('Generating knowledge graph...')):
                 mapping_output = llm_network_call(st.session_state.chat_history)
                 nodes, edges = json_parsing(mapping_output)
+                split_edge_labels(edges)
                 source_code=pyvis_graph(nodes, edges)
             st.markdown("**Knowledge Graph:**")
-            components.html(source_code, height=500,width=600)
+            components.html(source_code, height=500,width=800)
             download=st.download_button("Download HTML", data=source_code, file_name="knowledge_graph.html")
 
             with st.sidebar.expander("Debug"):
@@ -167,15 +194,3 @@ with col2:
                 st.write(nodes)
                 st.write(edges)
    # container.button("Start", type="primary")
-
-with col1:
-    display_container = st.container()
-    with display_container:
-        # displayPDF(file)
-        if st.session_state['binary']:
-            pdf_viewer(st.session_state.binary, width=700, height=1000)
-        else:
-            pdf_viewer(file, width=700, height=1000)
-
-    display_container.float()
-
