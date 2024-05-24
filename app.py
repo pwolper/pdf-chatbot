@@ -43,8 +43,10 @@ st.set_page_config(page_title="PDF Chatbot", page_icon=":books:", initial_sideba
 margins_css = """
     <style>
         .main > div {
-            padding-left: 0rem;
-            padding-right: 2rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 0rem;
+            padding-bottom: 0rem;
         }
     </style>
 """
@@ -61,6 +63,12 @@ articles = parse_bibtex()
 
 if 'binary' not in st.session_state:
     st.session_state['binary'] = None
+
+if 'uploaded_names' not in st.session_state:
+    st.session_state['uploaded_names'] = None
+
+if 'uploads' not in st.session_state:
+    st.session_state['uploads'] = None
 
 if 'article' not in st.session_state:
      st.session_state['article'] = None
@@ -82,15 +90,20 @@ with st.sidebar:
     uploaded = st.file_uploader("Upload an article",
                                     type="pdf", accept_multiple_files=True)
     if uploaded:
-        if not st.session_state['binary']:
-            binary_uploaded = []
+        # if not st.session_state['uploads']:
+        if uploaded:
+            st.session_state.binary = []
+            st.session_state.uploaded_names = []
+            st.session_state.uploads = {}
             for file in uploaded:
                 binary = file.getvalue()
+                st.session_state.uploaded_names.append(file.name)
+                st.session_state.uploads[file.name] = binary
+
                 with NamedTemporaryFile(delete=False) as tmp_file:
                     tmp_file.write(binary)
                     st.session_state['tmp_file_path'] = tmp_file.name
                     st.session_state.article = "Upload"
-                    st.session_state['binary'] = binary_uploaded.append(binary)
 
                     st.toast(f":page_facing_up: Reading file \"{file.name}\" and generating embeddings...")
                     docs = process_file(st.session_state.tmp_file_path)
@@ -101,7 +114,7 @@ with st.sidebar:
         st.session_state.article = st.selectbox("Browse library",
                                                 [a['title'] for a in articles],
                                                 index = None)
-        st.session_state.binary = None
+        st.session_state.uploads = None
 
         if st.session_state.article is not None:
             dir = "articles/"
@@ -124,7 +137,6 @@ with st.sidebar:
     st.markdown("Created by Philip Wolper ([phi.wolper@gmail.com](philip.wolper@gmail.com)). Code is available at [https://github.com/pwolper/pdf-chatbot.git](https://github.com/pwolper/pdf-chatbot) here. Feeback is very welcome.")
 
 
-
 if st.session_state.article is None:
     st.session_state.chat_history = [
         AIMessage(content="Hello, I am a helpful AI expert. How can I help you?"),]
@@ -138,8 +150,16 @@ with col1:
     display_container = st.container()
     with display_container:
         # displayPDF(file)
-        if st.session_state['binary']:
-            pdf_viewer(st.session_state.binary, width=800, height=1000)
+        if st.session_state['uploads']:
+            if len(st.session_state.uploads.keys()) > 1:
+                tab_labels = st.session_state.uploads.keys()
+                tabs = st.tabs(tab_labels)
+                for label, tab in zip(tab_labels, tabs):
+                    with tab:
+                        pdf_viewer(st.session_state.uploads[label], width=800, height=1000)
+
+            else:
+                pdf_viewer(list(st.session_state.uploads.values())[0], width=800, height=1000)
         else:
             pdf_viewer(file, width=800, height=1000)
 
