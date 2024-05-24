@@ -19,7 +19,6 @@ from functions import get_response, llm_network_call, json_parsing, pyvis_graph
 
 load_dotenv(find_dotenv())
 
-
 def get_api_key():
     if "openai_api_key" not in st.session_state:
         if not os.getenv("OPENAI_API_KEY"):
@@ -36,6 +35,7 @@ def get_api_key():
             st.session_state.openai_api_key=os.getenv("OPENAI_API_KEY")
             return
 
+
 ### Streamlit page starts here ###
 
 st.set_page_config(page_title="PDF Chatbot", page_icon=":books:", initial_sidebar_state="expanded", layout="wide")
@@ -43,6 +43,8 @@ st.set_page_config(page_title="PDF Chatbot", page_icon=":books:", initial_sideba
 float_init()
 
 get_api_key()
+
+print(st.session_state.openai_api_key)
 
 articles = parse_bibtex()
 
@@ -67,21 +69,22 @@ with st.sidebar:
     st.markdown("**Question AI models about articles and generate knowledge graphs to enhance text understanding.** Powered by OpenAI API and LangChain.")
 
     uploaded = st.file_uploader("Upload an article",
-                                    type="pdf")
+                                    type="pdf", accept_multiple_files=True)
     if uploaded:
         if not st.session_state['binary']:
-            binary = uploaded.getvalue()
-            with NamedTemporaryFile(delete=False) as tmp_file:
-                tmp_file.write(binary)
-                st.session_state['tmp_file_path'] = tmp_file.name
+            binary_uploaded = []
+            for file in uploaded:
+                binary = file.getvalue()
+                with NamedTemporaryFile(delete=False) as tmp_file:
+                    tmp_file.write(binary)
+                    st.session_state['tmp_file_path'] = tmp_file.name
+                    st.session_state.article = "Upload"
+                    st.session_state['binary'] = binary_uploaded.append(binary)
 
-            st.session_state.article = "Upload"
-            st.session_state['binary'] = binary
-
-            st.toast(":page_facing_up: Reading PDF file and generating embeddings...")
-            docs = process_file(st.session_state.tmp_file_path)
-            chunks = chunk_text(docs)
-            st.session_state.vector_db = create_vectorstore(chunks,"Upload")
+                    st.toast(f":page_facing_up: Reading file \"{file.name}\" and generating embeddings...")
+                    docs = process_file(st.session_state.tmp_file_path)
+                    chunks = chunk_text(docs)
+                    st.session_state.vector_db = create_vectorstore(chunks,file.name)
 
     else:
         st.session_state.article = st.selectbox("Browse library",
