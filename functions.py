@@ -49,10 +49,13 @@ def chunk_text(docs):
 
 #@st.cache_data()
 def create_vectorstore(chunks, pdf):
-        embeddings = OpenAIEmbeddings()
-        vectorstore = faiss.FAISS.from_documents(chunks, embeddings)
-        vectorstore.save_local("vector_db", index_name=pdf)
-        return(vectorstore)
+    if not os.path.exists("vector_db"):
+        os.makedirs("vector_db")
+
+    embeddings = OpenAIEmbeddings()
+    vectorstore = faiss.FAISS.from_documents(chunks, embeddings)
+    vectorstore.save_local("vector_db", index_name=pdf)
+    return(vectorstore)
 
 def load_vectorstore(index_name):
     vectorstore = faiss.FAISS.load_local("vector_db",
