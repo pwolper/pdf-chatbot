@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import re, time
+import re, time, os
 from typing import List
 import json
 from pyvis.network import Network
