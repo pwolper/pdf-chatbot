@@ -34,7 +34,9 @@ def get_api_key():
                 openai_input_field.empty()
         else:
             st.session_state.openai_api_key=os.getenv("OPENAI_API_KEY")
-            return
+    else:
+        st.stop()
+        return
 
 
 ### Streamlit page starts here ###
