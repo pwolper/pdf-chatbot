@@ -57,15 +57,7 @@ float_init()
 
 get_api_key()
 
-print(st.session_state.openai_api_key)
-
 articles = parse_bibtex()
-
-if 'binary' not in st.session_state:
-    st.session_state['binary'] = None
-
-if 'uploaded_names' not in st.session_state:
-    st.session_state['uploaded_names'] = None
 
 if 'uploads' not in st.session_state:
     st.session_state['uploads'] = None
@@ -83,58 +75,69 @@ if "chat_history" not in st.session_state:
 if "retrieved" not in st.session_state:
     st.session_state.retrieved = None
 
-with st.sidebar:
-    st.sidebar.title("PDF chatbot")
-    st.markdown("**Question AI models about articles and generate knowledge graphs to enhance text understanding.** Powered by OpenAI API and LangChain.")
+st.sidebar.title("PDF chatbot")
+st.sidebar.markdown("**Question AI models about articles and generate knowledge graphs to enhance text understanding.** Powered by OpenAI API and LangChain.")
 
-    uploaded = st.file_uploader("Upload an article",
+uploaded = st.sidebar.file_uploader("Upload an article",
                                     type="pdf", accept_multiple_files=True)
-    if uploaded:
-        # if not st.session_state['uploads']:
-        if uploaded:
-            st.session_state.binary = []
-            st.session_state.uploaded_names = []
-            st.session_state.uploads = {}
-            for file in uploaded:
-                binary = file.getvalue()
-                st.session_state.uploaded_names.append(file.name)
-                st.session_state.uploads[file.name] = binary
 
-                with NamedTemporaryFile(delete=False) as tmp_file:
-                    tmp_file.write(binary)
-                    st.session_state['tmp_file_path'] = tmp_file.name
-                    st.session_state.article = "Upload"
+st.session_state.article = st.sidebar.selectbox("Browse library",
+                                        [a['title'] for a in articles],
+                                        index = None)
 
-                    st.toast(f":page_facing_up: Reading file \"{file.name}\" and generating embeddings...")
+st.sidebar.markdown("**_Tips_**")
+st.sidebar.markdown("Ask specific questions using keywords found in the paper!")
+st.sidebar.markdown("Be patient and try different prompts.")
+
+st.sidebar.markdown("**_About_**")
+st.sidebar.markdown("Created by Philip Wolper ([phi.wolper@gmail.com](philip.wolper@gmail.com)). Code is available at [https://github.com/pwolper/pdf-chatbot.git](https://github.com/pwolper/pdf-chatbot) here. Feeback is very welcome.")
+
+if uploaded:
+    st.session_state.uploads = {}
+    for file in uploaded:
+        binary = file.getvalue()
+        st.session_state.uploads[file.name] = binary
+        with NamedTemporaryFile(delete=False) as tmp_file:
+            tmp_file.write(binary)
+            st.session_state['tmp_file_path'] = tmp_file.name
+            st.session_state.article = "Upload"
+
+            if str(file.name + ".faiss") not in os.listdir("vector_db"):
+                st.toast(f":page_facing_up: Reading file \"{file.name}\" and generating embeddings...")
+                st.write("")
+                with st.spinner(f"Reading file \"{file.name}\" and generating embeddings"):
                     docs = process_file(st.session_state.tmp_file_path)
                     chunks = chunk_text(docs)
                     st.session_state.vector_db = create_vectorstore(chunks,file.name)
 
-    else:
-        st.session_state.article = st.selectbox("Browse library",
-                                                [a['title'] for a in articles],
-                                                index = None)
-        st.session_state.uploads = None
-
-        if st.session_state.article is not None:
-            dir = "articles/"
-            pdf = str([a['pdf'] for a in articles if a['title'] == st.session_state.article][0])
-            file = dir + pdf
-
-            if str(pdf + ".faiss") not in os.listdir("vector_db"):
-                st.toast(":page_facing_up: Generating embeddings...")
-                docs = process_file(file)
-                chunks = chunk_text(docs)
-                st.session_state.vector_db = create_vectorstore(chunks,file)
+    if len(st.session_state.uploads.keys()) > 1:
+        st.session_state.vector_db = {}
+        for i, upload in enumerate(list(st.session_state.uploads.keys())):
+            if i == 0:
+                st.session_state.vector_db = load_vectorstore(upload)
+                print(f"Created vectorstore for {upload}")
             else:
-                st.session_state.vector_db = load_vectorstore(pdf)
+                db = load_vectorstore(upload)
+                st.session_state.vector_db.merge_from(db)
+                print(f"Merged {upload} into existing vectorstore")
+    else:
+        st.session_state.vector_db = load_vectorstore(list(st.session_state.uploads.keys())[0])
+        print(f"Created vectorstore for {list(st.session_state.uploads.keys())[0]}")
 
-    st.markdown("**_Tips_**")
-    st.markdown("Ask specific questions using keywords found in the paper!")
-    st.markdown("Be patient and try different prompts.")
+else: #article from library list
+    st.session_state.uploads = {}
+    if st.session_state.article is not None:
+        dir = "articles/"
+        pdf = str([a['pdf'] for a in articles if a['title'] == st.session_state.article][0])
+        file = dir + pdf
 
-    st.markdown("**_About_**")
-    st.markdown("Created by Philip Wolper ([phi.wolper@gmail.com](philip.wolper@gmail.com)). Code is available at [https://github.com/pwolper/pdf-chatbot.git](https://github.com/pwolper/pdf-chatbot) here. Feeback is very welcome.")
+        if str(pdf + ".faiss") not in os.listdir("vector_db"):
+            st.toast(":page_facing_up: Generating embeddings...")
+            docs = process_file(file)
+            chunks = chunk_text(docs)
+            st.session_state.vector_db = create_vectorstore(chunks,file)
+        else:
+            st.session_state.vector_db = load_vectorstore(pdf)
 
 
 if st.session_state.article is None:
@@ -149,7 +152,6 @@ col1, col2 = st.columns([1,1], gap="small")
 with col1:
     display_container = st.container()
     with display_container:
-        # displayPDF(file)
         if st.session_state['uploads']:
             if len(st.session_state.uploads.keys()) > 1:
                 tab_labels = st.session_state.uploads.keys()
@@ -157,12 +159,10 @@ with col1:
                 for label, tab in zip(tab_labels, tabs):
                     with tab:
                         pdf_viewer(st.session_state.uploads[label], width=800, height=1000)
-
             else:
                 pdf_viewer(list(st.session_state.uploads.values())[0], width=800, height=1000)
         else:
             pdf_viewer(file, width=800, height=1000)
-
     display_container.float()
 
 with col2:
