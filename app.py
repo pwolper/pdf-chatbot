@@ -30,7 +30,7 @@ def get_api_key():
             if st.session_state.openai_api_key_input != "":
                 st.session_state.openai_api_key=st.session_state.openai_api_key_input
                 openai_input_field.success("API key saved...")
-                time.sleep(.5)
+                time.sleep(3)
                 openai_input_field.empty()
         else:
             st.session_state.openai_api_key=os.getenv("OPENAI_API_KEY")
