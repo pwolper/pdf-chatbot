@@ -22,6 +22,7 @@ load_dotenv(find_dotenv())
 def get_api_key():
     if "openai_api_key" not in st.session_state:
         if not os.getenv("OPENAI_API_KEY"):
+            st.write("\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
             openai_input_field=st.empty()
             openai_input_field.text_input(label="OpenAI API Key ",  placeholder="Ex: sk-2twmA8tfCb8un4...",
                                           key="openai_api_key_input", type="password",
