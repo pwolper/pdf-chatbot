@@ -141,7 +141,7 @@ else: #article from library list
             st.toast(":page_facing_up: Generating embeddings...")
             docs = process_file(file)
             chunks = chunk_text(docs)
-            st.session_state.vector_db = create_vectorstore(chunks,file)
+            st.session_state.vector_db = create_vectorstore(chunks,pdf)
         else:
             st.session_state.vector_db = load_vectorstore(pdf)
 
