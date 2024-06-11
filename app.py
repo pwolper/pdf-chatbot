@@ -87,9 +87,9 @@ st.sidebar.markdown("**Question AI models about articles and generate knowledge 
 uploaded = st.sidebar.file_uploader("Upload an article",
                                     type="pdf", accept_multiple_files=True)
 
-# st.session_state.article = st.sidebar.selectbox("Browse library",
-#                                         [a['title'] for a in articles],
-#                                         index = None)
+st.session_state.article = st.sidebar.selectbox("Browse library",
+                                        [a['title'] for a in articles],
+                                        index = None)
 
 st.sidebar.markdown("**_Tips_**")
 st.sidebar.markdown("Ask specific questions using keywords found in the paper!")
