@@ -78,6 +78,9 @@ if "chat_history" not in st.session_state:
 if "retrieved" not in st.session_state:
     st.session_state.retrieved = None
 
+if not os.path.exists('vector_db'):
+    os.makedirs('vector_db')
+
 st.sidebar.title("PDF chatbot")
 st.sidebar.markdown("**Question AI models about articles and generate knowledge graphs to enhance text understanding.** Powered by OpenAI API and LangChain.")
 
