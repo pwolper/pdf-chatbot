@@ -34,8 +34,8 @@ def get_api_key():
                 openai_input_field.empty()
         else:
             st.session_state.openai_api_key=os.getenv("OPENAI_API_KEY")
-    else:
-        st.stop()
+    # else:
+    #     st.stop()
         return
 
 
