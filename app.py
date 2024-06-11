@@ -59,6 +59,7 @@ st.markdown(margins_css, unsafe_allow_html=True)
 float_init()
 
 get_api_key()
+print(st.session_state.openai_api_key)
 
 articles = parse_bibtex()
 
